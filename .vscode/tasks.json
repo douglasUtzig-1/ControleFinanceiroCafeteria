@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev: Vite (porta 8080)",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/coffee-shop-finances",
+        "env": {
+          "Path": "${workspaceFolder}/coffee-shop-finances/.tools/node;${env:Path}"
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "check: Supabase (.env + API)",
+      "type": "shell",
+      "command": "npm run check:supabase",
+      "options": {
+        "cwd": "${workspaceFolder}/coffee-shop-finances",
+        "env": {
+          "Path": "${workspaceFolder}/coffee-shop-finances/.tools/node;${env:Path}"
+        }
+      },
+      "problemMatcher": []
+    }
+  ]
+}

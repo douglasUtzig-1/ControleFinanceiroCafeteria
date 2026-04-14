@@ -1,0 +1,18 @@
+---
+description: Banco Supabase oficial do coffee-shop-finances
+globs: supabase/**/*.sql,**/billing.ts,**/receivables.ts,**/.env*,**/types.ts
+---
+
+# Projeto Supabase
+
+- **Project ref:** `gwsuvkcbgczihtqcjjux`
+- **URL:** `https://gwsuvkcbgczihtqcjjux.supabase.co`
+
+Toda alteração de schema (migrações SQL), `supabase link`, `supabase db push` e `supabase gen types` deve usar **este** projeto.
+
+Arquivos de referência:
+
+- `supabase/migrations/` — ordem cronológica; não editar migrações já aplicadas em produção; criar nova migração para mudanças.
+- `supabase/config.toml` — `project_id` deve permanecer `gwsuvkcbgczihtqcjjux` salvo decisão explícita de troca de projeto.
+
+Não commitar `.env` (contém chave anon). Usar `.env.example` como modelo.

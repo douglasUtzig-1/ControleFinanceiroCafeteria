@@ -1,0 +1,14 @@
+{
+  "name": "coffee-shop-finances",
+  "private": true,
+  "description": "Scripts na raiz do repositório — a aplicação fica em coffee-shop-finances/",
+  "scripts": {
+    "dev": "npm run dev --prefix coffee-shop-finances",
+    "build": "npm run build --prefix coffee-shop-finances",
+    "preview": "npm run preview --prefix coffee-shop-finances",
+    "install:app": "npm install --prefix coffee-shop-finances",
+    "lint": "npm run lint --prefix coffee-shop-finances",
+    "test": "npm run test --prefix coffee-shop-finances",
+    "check:supabase": "npm run check:supabase --prefix coffee-shop-finances"
+  }
+}

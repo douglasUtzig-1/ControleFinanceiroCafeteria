@@ -1,0 +1,10 @@
+---
+description: Onde criar arquivos Markdown de plano (roadmaps, specs, tarefas)
+alwaysApply: true
+---
+
+# Local dos planos (Markdown)
+
+- Todo arquivo **.md** que documente um **plano** (roadmap, especificação de feature, lista de tarefas de implementação, notas de planejamento para o projeto) deve ser criado **dentro da pasta `Planos/`** na raiz do app (`coffee-shop-finances/Planos/`).
+- Preserve subpastas quando fizer sentido (ex.: `Planos/.lovable/plan.md` para contexto Lovable), em vez de soltar planos na raiz do repositório ou em pastas de código.
+- Não mover para `Planos/` documentação que não seja “plano”: README do projeto, `supabase/EXPECTED_SCHEMA.md`, changelogs de ferramentas, etc., salvo pedido explícito.
