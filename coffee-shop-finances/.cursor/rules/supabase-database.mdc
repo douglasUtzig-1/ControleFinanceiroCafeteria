@@ -16,3 +16,5 @@ Arquivos de referência:
 - `supabase/config.toml` — `project_id` deve permanecer `gwsuvkcbgczihtqcjjux` salvo decisão explícita de troca de projeto.
 
 Não commitar `.env` (contém chave anon). Usar `.env.example` como modelo.
+
+`SUPABASE_ACCESS_TOKEN` no `.env`: ver regra dedicada `env-supabase-access-token.mdc` (não apagar nem sobrescrever pelo agente).

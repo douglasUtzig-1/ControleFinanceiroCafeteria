@@ -32,6 +32,31 @@ export function loadEnvFile() {
   return parseEnv(fs.readFileSync(ENV_PATH, "utf8"));
 }
 
+/** Chaves VITE_* que o check de Supabase e o Vite usam no frontend. */
+export const VITE_SUPABASE_ENV_KEYS = [
+  "VITE_SUPABASE_URL",
+  "VITE_SUPABASE_PUBLISHABLE_KEY",
+  "VITE_SUPABASE_ANON_KEY",
+  "VITE_SUPABASE_PROJECT_ID",
+  "VITE_SUPABASE_SERVICE_ROLE_KEY",
+];
+
+/**
+ * Mescla .env com process.env: valores não vazios em process sobrescrevem o arquivo
+ * (útil na Vercel/CI, onde não há .env commitado).
+ */
+export function loadEffectiveSupabaseEnv() {
+  const fromFile = loadEnvFile();
+  const out = { ...fromFile };
+  for (const key of VITE_SUPABASE_ENV_KEYS) {
+    const v = process.env[key];
+    if (typeof v === "string" && v.trim() !== "") {
+      out[key] = v.trim();
+    }
+  }
+  return out;
+}
+
 export function loadProjectRefFromConfig() {
   if (!fs.existsSync(CONFIG_PATH)) return null;
   const text = fs.readFileSync(CONFIG_PATH, "utf8");

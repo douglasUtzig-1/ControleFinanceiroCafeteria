@@ -7,7 +7,7 @@ import {
   ENV_PATH,
   PROJECT_REF,
   PROJECT_URL,
-  loadEnvFile,
+  loadEffectiveSupabaseEnv,
   isNonEmpty,
 } from "./supabase-shared.mjs";
 
@@ -26,11 +26,10 @@ async function selectTable(baseUrl, key, table, columns) {
 
 async function main() {
   if (!fs.existsSync(ENV_PATH)) {
-    console.error("Falta .env na raiz do projeto. Copie .env.example e preencha a chave anon.");
-    process.exit(1);
+    console.warn("AVISO: .env ausente; usando variáveis de ambiente (ex.: Vercel/CI).");
   }
 
-  const env = loadEnvFile();
+  const env = loadEffectiveSupabaseEnv();
   const url = env.VITE_SUPABASE_URL;
   const publishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY;
   const anonAliasKey = env.VITE_SUPABASE_ANON_KEY;
@@ -39,7 +38,7 @@ async function main() {
 
   if (!url || !key || !isNonEmpty(url) || !isNonEmpty(key)) {
     console.error(
-      "Defina VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY no .env (chave anon em Settings → API)."
+      "Defina VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY (ou ANON_KEY) no .env ou nas variáveis de ambiente (Settings → API no Supabase)."
     );
     process.exit(1);
   }
@@ -62,7 +61,7 @@ async function main() {
     {
       table: "billing_data",
       columns:
-        "data,abertura,fechamento,qtde_vendas,dinheiro,pix,credito,debito,qr_code,retirada,transferencia,debito_bruto,debito_liquido,credito_bruto,credito_liquido,debito_pos,credito_pos,total_credito_sistema_pos,observacoes,created_at,updated_at",
+        "data,abertura,fechamento,qtde_vendas,dinheiro,pix,credito,debito,qr_code,pix_pos,retirada,transferencia,debito_bruto,debito_liquido,credito_bruto,credito_liquido,debito_pos,credito_pos,total_credito_sistema_pos,observacoes,created_at,updated_at",
     },
     {
       table: "receivables_data",
@@ -75,6 +74,16 @@ async function main() {
     const { ok, status, table: t, body } = await selectTable(url, key, item.table, item.columns);
     if (!ok) {
       console.error(`Falha ${t}: HTTP ${status} (verifique migrações, colunas e RLS). Resposta: ${body}`);
+      try {
+        const j = JSON.parse(body);
+        if (j.message?.includes("pix_pos")) {
+          console.error(
+            "Dica: a coluna pix_pos ainda não existe no Postgres remoto. Rode `npm run supabase:db:push` com SUPABASE_ACCESS_TOKEN no .env, ou aplique a migração manualmente no SQL Editor."
+          );
+        }
+      } catch {
+        /* ignore JSON parse */
+      }
       process.exit(1);
     }
     console.log(`OK ${t}: HTTP ${status} (colunas válidas)`);

@@ -1,0 +1,12 @@
+---
+description: Proteger SUPABASE_ACCESS_TOKEN no .env — alteração só manual pelo usuário
+alwaysApply: true
+---
+
+# `SUPABASE_ACCESS_TOKEN` no `.env`
+
+- **Nunca** remover, comentar, truncar, substituir ou sobrescrever o valor de `SUPABASE_ACCESS_TOKEN`, nem regravar o arquivo `.env` de um modo que apague ou altere essa variável.
+- **Não** colar o token em arquivos versionados (regras, código, `.env.example`, planos, commits). Segredos ficam **apenas** no `.env` local, editado pelo usuário.
+- Se for necessário alterar o token, **orientar** o usuário a editar manualmente o `.env` no Cursor; **não** aplicar a troca via agente salvo pedido explícito e inequívoco do usuário para atualizar **essa** variável — e mesmo assim preferir edição manual.
+- Ao alterar outras chaves no `.env` (ex.: `VITE_*`), **preservar** linhas de `SUPABASE_ACCESS_TOKEN` intactas; evitar reescrever o arquivo inteiro só para “organizar”.
+- Scripts do projeto **não** devem apagar ou sobrescrever `SUPABASE_ACCESS_TOKEN` ao rodar (somente leitura do `.env` para `process.env`).

@@ -25,6 +25,11 @@ export const emptyReceivablesRecord = (data: string = ''): ReceivablesRecord => 
   recebidoTotalLiquido: 0,
 });
 
+/** Mesma regra que ReceivablesForm (Recebíveis OK?). */
+export function computeRecebiveisOk(record: ReceivablesRecord): number {
+  return record.recebidoItauDebito + record.recebidoItauCredito - record.recebidoTotalLiquido;
+}
+
 type ReceivablesRow = Tables<'receivables_data'>;
 
 const dbToRecord = (row: ReceivablesRow): ReceivablesRecord => ({

@@ -8,7 +8,7 @@ import {
   ENV_PATH,
   PROJECT_REF,
   PROJECT_URL,
-  loadEnvFile,
+  loadEffectiveSupabaseEnv,
   loadProjectRefFromConfig,
   isNonEmpty,
 } from "./supabase-shared.mjs";
@@ -30,17 +30,27 @@ function main() {
     fail(`project_id inválido em supabase/config.toml: ${configProjectRef}. Esperado: ${PROJECT_REF}.`);
   }
 
-  if (!fs.existsSync(ENV_PATH)) fail("Arquivo .env ausente. Copie .env.example e preencha as credenciais.");
-  const env = loadEnvFile();
+  const hasEnvFile = fs.existsSync(ENV_PATH);
+  if (!hasEnvFile) {
+    warn("Arquivo .env ausente; usando variáveis de ambiente (ex.: Vercel/CI).");
+  }
+
+  const env = loadEffectiveSupabaseEnv();
   const url = env.VITE_SUPABASE_URL;
   const publishable = env.VITE_SUPABASE_PUBLISHABLE_KEY;
   const anonAlias = env.VITE_SUPABASE_ANON_KEY;
   const projectId = env.VITE_SUPABASE_PROJECT_ID;
   const serviceRole = env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!isNonEmpty(url)) fail("VITE_SUPABASE_URL ausente no .env.");
+  if (!isNonEmpty(url)) {
+    fail(
+      "VITE_SUPABASE_URL ausente. Local: copie .env.example para .env. Vercel/CI: defina nas Environment Variables."
+    );
+  }
   if (!isNonEmpty(publishable) && !isNonEmpty(anonAlias)) {
-    fail("Defina VITE_SUPABASE_PUBLISHABLE_KEY (ou VITE_SUPABASE_ANON_KEY) no .env.");
+    fail(
+      "Defina VITE_SUPABASE_PUBLISHABLE_KEY (ou VITE_SUPABASE_ANON_KEY) no .env ou nas variáveis de ambiente do deploy."
+    );
   }
   if (isNonEmpty(publishable) && isNonEmpty(anonAlias) && publishable !== anonAlias) {
     fail("VITE_SUPABASE_PUBLISHABLE_KEY e VITE_SUPABASE_ANON_KEY divergem.");

@@ -19,10 +19,27 @@ import {
   TableRow,
   TableCell,
 } from '@/components/ui/table';
-import { formatCurrency, formatDateBR, loadBillingDataByPeriod, type BillingRecord } from '@/lib/billing';
+import {
+  formatCurrency,
+  formatDateBR,
+  loadBillingDataByPeriod,
+  type BillingRecord,
+} from '@/lib/billing';
+import { computeLancamentosOkValues, validationValueClass } from '@/lib/billingValidation';
+import {
+  computeRecebiveisOk,
+  emptyReceivablesRecord,
+  loadReceivablesDataByPeriod,
+  type ReceivablesRecord,
+} from '@/lib/receivables';
 
 const COLUMNS = [
   'Data',
+  'Caixa OK?',
+  'PIX OK?',
+  'Crédito OK?',
+  'Débito OK?',
+  'Recebiveis OK?',
   'Saldo Caixa',
   'Total Sistema',
   'Ticket Médio',
@@ -36,6 +53,11 @@ const COLUMNS = [
 
 type SummaryRow = {
   data: string;
+  caixaOk: number;
+  pixOk: number;
+  creditoOk: number;
+  debitoOk: number;
+  recebiveisOk: number;
   saldoCaixa: number;
   totalSistema: number;
   ticketMedio: number;
@@ -57,19 +79,29 @@ const ResumoTab = () => {
 
   const toIsoDate = useCallback((date: Date) => format(date, 'yyyy-MM-dd'), []);
 
-  const mapRecordToSummary = useCallback((record: BillingRecord): SummaryRow => {
+  const mapRecordToSummary = useCallback(
+    (record: BillingRecord, recebiveisByDate: Map<string, ReceivablesRecord>): SummaryRow => {
     const saldoCaixa = record.fechamento - record.abertura;
     const totalSistema = record.dinheiro + record.pix + record.credito + record.debito;
     const ticketMedio = record.qtdeVendas > 0 ? totalSistema / record.qtdeVendas : 0;
     const totalCreditoSistemaPos = record.totalCreditoSistemaPos;
-    const totalPix = record.qrCode + record.transferencia;
+    const totalPix = record.qrCode + record.pixPos + record.transferencia;
     const totalCartaoBruto = record.debitoBruto + record.creditoBruto;
     const totalCartaoLiquido = record.debitoLiquido + record.creditoLiquido;
     const totalCreditoTefPos = record.creditoBruto + record.creditoPos;
     const totalDebitoTefPos = record.debitoBruto + record.debitoPos;
 
+    const { caixaOk, pixOk, creditoOk, debitoOk } = computeLancamentosOkValues(record);
+    const recRow = recebiveisByDate.get(record.data) ?? emptyReceivablesRecord(record.data);
+    const recebiveisOk = computeRecebiveisOk(recRow);
+
     return {
       data: record.data,
+      caixaOk,
+      pixOk,
+      creditoOk,
+      debitoOk,
+      recebiveisOk,
       saldoCaixa,
       totalSistema,
       ticketMedio,
@@ -115,8 +147,12 @@ const ResumoTab = () => {
 
       setIsLoading(true);
       try {
-        const data = await loadBillingDataByPeriod(start, end);
-        setRows(data.map(mapRecordToSummary));
+        const [billingRows, receivablesRows] = await Promise.all([
+          loadBillingDataByPeriod(start, end),
+          loadReceivablesDataByPeriod(start, end),
+        ]);
+        const recebiveisByDate = new Map(receivablesRows.map((r) => [r.data, r]));
+        setRows(billingRows.map((r) => mapRecordToSummary(r, recebiveisByDate)));
       } catch (error) {
         console.error('Erro ao consultar resumo por período:', error);
         setRows([]);
@@ -260,6 +296,31 @@ const ResumoTab = () => {
               {rows.length > 0 ? rows.map((row) => (
                 <TableRow key={row.data} className="hover:bg-muted/20">
                   <TableCell className="whitespace-nowrap">{formatDateBR(row.data)}</TableCell>
+                  <TableCell className="whitespace-nowrap text-right">
+                    <span className={cn('font-semibold tabular-nums', validationValueClass(row.caixaOk))}>
+                      {formatCurrency(row.caixaOk)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap text-right">
+                    <span className={cn('font-semibold tabular-nums', validationValueClass(row.pixOk))}>
+                      {formatCurrency(row.pixOk)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap text-right">
+                    <span className={cn('font-semibold tabular-nums', validationValueClass(row.creditoOk))}>
+                      {formatCurrency(row.creditoOk)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap text-right">
+                    <span className={cn('font-semibold tabular-nums', validationValueClass(row.debitoOk))}>
+                      {formatCurrency(row.debitoOk)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap text-right">
+                    <span className={cn('font-semibold tabular-nums', validationValueClass(row.recebiveisOk))}>
+                      {formatCurrency(row.recebiveisOk)}
+                    </span>
+                  </TableCell>
                   <TableCell className="whitespace-nowrap text-right">{formatCurrency(row.saldoCaixa)}</TableCell>
                   <TableCell className="whitespace-nowrap text-right">{formatCurrency(row.totalSistema)}</TableCell>
                   <TableCell className="whitespace-nowrap text-right">{formatCurrency(row.ticketMedio)}</TableCell>

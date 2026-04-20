@@ -16,6 +16,7 @@ Tabelas criadas pelas migrações em `supabase/migrations/`.
 | `credito` | `credito` |
 | `debito` | `debito` |
 | `qr_code` | `qrCode` |
+| `pix_pos` | `pixPos` (PIX banco — máquina/POS; distinto de débito/crédito POS cartão) |
 | `retirada` | `retirada` |
 | `transferencia` | `transferencia` |
 | `debito_bruto` | `debitoBruto` |

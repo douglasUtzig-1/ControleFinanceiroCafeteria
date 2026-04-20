@@ -1,11 +1,13 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
-import { CreditCard, Wallet, Save, X, CalendarDays, Clock } from 'lucide-react';
+import { CreditCard, Wallet, Save, X, CalendarDays, Clock, ShieldCheck } from 'lucide-react';
 import CurrencyInput from '@/components/CurrencyInput';
+import ValidationField from '@/components/ValidationField';
 import { formatCurrencyInput, formatDateBR, getLatestDate } from '@/lib/billing';
 import {
   ReceivablesRecord,
   emptyReceivablesRecord,
+  computeRecebiveisOk,
   loadAllReceivablesData,
   saveReceivablesRecord,
 } from '@/lib/receivables';
@@ -149,6 +151,9 @@ const ReceivablesForm = () => {
   const handleCancel = useCallback(() => {
     resetForm();
   }, [resetForm]);
+
+  const recebiveisOk = computeRecebiveisOk(record);
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3">
@@ -218,6 +223,24 @@ const ReceivablesForm = () => {
           <CurrencyInput id="recebidoAdqDbBruto" label="Recebido Rede - Crédito (Bruto)" value={currencyFields.recebidoRedeCreditoBruto || ''} onChange={(d, n) => handleCurrencyChange('recebidoRedeCreditoBruto', d, n)} />
           <CurrencyInput id="taxaTarifa" label="Taxa/Tarifa" value={currencyFields.taxaTarifa || ''} onChange={(d, n) => handleCurrencyChange('taxaTarifa', d, n)} />
           <CurrencyInput id="recebidoTotalLiquido" label="Recebido Total - Líquido" value={currencyFields.recebidoTotalLiquido || ''} onChange={(d, n) => handleCurrencyChange('recebidoTotalLiquido', d, n)} readOnly />
+        </div>
+      </div>
+
+      <div className="billing-section">
+        <div className="billing-section-header">
+          <div className="billing-section-icon">
+            <ShieldCheck className="w-4 h-4" />
+          </div>
+          <div className="billing-section-title">Validação</div>
+        </div>
+        <div className="max-w-xl">
+          <ValidationField
+            label="Recebiveis OK?"
+            value={recebiveisOk}
+            successMsg="Recebiveis OK!"
+            warningMsg="Valor na conta maior que no cartão, revisar adquirência"
+            errorMsg="Valor na conta MENOR que no cartão, revisar conta bancária"
+          />
         </div>
       </div>
       </fieldset>

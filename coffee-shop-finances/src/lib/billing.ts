@@ -37,6 +37,8 @@ export interface BillingRecord {
   credito: number;
   debito: number;
   qrCode: number;
+  /** PIX recebido via máquina/POS (banco); distinto de débito/crédito POS cartão */
+  pixPos: number;
   retirada: number;
   transferencia: number;
   debitoBruto: number;
@@ -60,6 +62,7 @@ export const emptyRecord = (data: string = ''): BillingRecord => ({
   credito: 0,
   debito: 0,
   qrCode: 0,
+  pixPos: 0,
   retirada: 0,
   transferencia: 0,
   debitoBruto: 0,
@@ -85,6 +88,7 @@ const dbToRecord = (row: BillingRow): BillingRecord => ({
   credito: row.credito || 0,
   debito: row.debito || 0,
   qrCode: row.qr_code || 0,
+  pixPos: row.pix_pos || 0,
   retirada: row.retirada || 0,
   transferencia: row.transferencia || 0,
   debitoBruto: row.debito_bruto || 0,
@@ -111,6 +115,7 @@ const recordToDb = (record: BillingRecord) => ({
   credito: record.credito,
   debito: record.debito,
   qr_code: record.qrCode,
+  pix_pos: record.pixPos,
   retirada: record.retirada,
   transferencia: record.transferencia,
   debito_bruto: record.debitoBruto,

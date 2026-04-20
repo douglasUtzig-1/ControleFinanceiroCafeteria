@@ -4,17 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node scripts/supabase-env-check.mjs && scripts\\run-vite.cmd",
-    "build": "node scripts/supabase-env-check.mjs && scripts\\run-vite.cmd build",
-    "build:dev": "scripts\\run-vite.cmd build --mode development",
+    "dev": "node scripts/supabase-env-check.mjs && vite",
+    "build": "node scripts/supabase-env-check.mjs && vite build",
+    "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "scripts\\run-vite.cmd preview",
+    "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "supabase:link": "npx supabase link --project-ref gwsuvkcbgczihtqcjjux",
-    "supabase:db:push": "npx supabase db push",
+    "supabase:db:push": "node scripts/supabase-db-push.mjs",
     "supabase:types": "npx supabase gen types typescript --project-id gwsuvkcbgczihtqcjjux --schema public > src/integrations/supabase/types.ts",
     "check:supabase": "node scripts/supabase-env-check.mjs && node scripts/supabase-schema-check.mjs",
+    "validate:supabase": "node scripts/supabase-validate.mjs",
     "supabase:sync": "npm run supabase:db:push && npm run supabase:types && npm run check:supabase"
   },
   "dependencies": {

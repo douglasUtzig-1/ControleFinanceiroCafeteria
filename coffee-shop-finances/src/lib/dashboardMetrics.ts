@@ -16,7 +16,7 @@ function taxaCartaoDia(r: BillingRecord): number {
 }
 
 function dinheiroPix(r: BillingRecord): number {
-  return r.dinheiro + r.pix + r.qrCode + r.transferencia;
+  return r.dinheiro + r.pix + r.qrCode + r.pixPos + r.transferencia;
 }
 
 export type DreRowType = 'normal' | 'deduction' | 'subtotal' | 'total';

@@ -26,6 +26,7 @@ import {
   getLatestDate,
   formatCurrencyInput,
 } from '@/lib/billing';
+import { computeLancamentosOkValues } from '@/lib/billingValidation';
 
 const BillingForm = () => {
   const [allData, setAllData] = useState<Record<string, BillingRecord>>({});
@@ -78,7 +79,7 @@ const BillingForm = () => {
         setRecord(existing);
         const fields: (keyof BillingRecord)[] = [
           'abertura', 'fechamento', 'dinheiro', 'pix', 'credito', 'debito',
-          'qrCode', 'retirada', 'transferencia', 'debitoBruto', 'debitoLiquido',
+          'qrCode', 'pixPos', 'retirada', 'transferencia', 'debitoBruto', 'debitoLiquido',
           'creditoBruto', 'creditoLiquido', 'debitoPos', 'creditoPos'
         ];
         const newCurrency: Record<string, string> = {};
@@ -107,17 +108,12 @@ const BillingForm = () => {
   const totalSistema = record.dinheiro + record.pix + record.credito + record.debito;
   const ticketMedio = record.qtdeVendas > 0 ? totalSistema / record.qtdeVendas : 0;
   const totalCreditoSistemaPos = record.credito + record.creditoPos;
-  const totalPix = record.qrCode + record.transferencia;
+  const totalPix = record.qrCode + record.pixPos + record.transferencia;
   const totalCartaoBruto = record.debitoBruto + record.creditoBruto;
   const totalCartaoLiquido = record.debitoLiquido + record.creditoLiquido;
   const totalCreditoTefPos = record.creditoBruto + record.creditoPos;
   const totalDebitoTefPos = record.debitoBruto + record.debitoPos;
-  const caixaOk = (saldoCaixa + record.retirada) - (record.dinheiro - (record.debitoPos + record.creditoPos));
-  const pixOk = record.qrCode - record.pix;
-  // Crédito Bruto − Total Crédito (Sistema + POS); mesma regra de mensagem no ValidationField (zero / >0 / <0)
-  const creditoOk = record.creditoBruto - totalCreditoSistemaPos;
-  // Total Débito (TEF + POS) = débitoBruto + débitoPos; confronta com "Débito" do sistema (mesma lógica do Crédito OK?)
-  const debitoOk = totalDebitoTefPos - record.debito;
+  const { caixaOk, pixOk, creditoOk, debitoOk } = computeLancamentosOkValues(record);
 
   const handleSave = useCallback(async () => {
     if (!record.data) {
@@ -274,8 +270,9 @@ const BillingForm = () => {
               <div className="billing-section-title">Vendas Pix — Banco</div>
             </div>
             <CurrencyInput id="qrCode" label="QR Code" value={currencyFields.qrCode || ''} onChange={(d, n) => setCurrencyField('qrCode', d, n)} />
-            <CurrencyInput id="retirada" label="Retirada" value={currencyFields.retirada || ''} onChange={(d, n) => setCurrencyField('retirada', d, n)} />
+            <CurrencyInput id="pixPos" label="POS" value={currencyFields.pixPos || ''} onChange={(d, n) => setCurrencyField('pixPos', d, n)} />
             <CurrencyInput id="transferencia" label="Transferência" value={currencyFields.transferencia || ''} onChange={(d, n) => setCurrencyField('transferencia', d, n)} />
+            <CurrencyInput id="retirada" label="Retirada" value={currencyFields.retirada || ''} onChange={(d, n) => setCurrencyField('retirada', d, n)} />
             <CalculatedField label="Total PIX" value={totalPix} />
           </div>
         </div>
