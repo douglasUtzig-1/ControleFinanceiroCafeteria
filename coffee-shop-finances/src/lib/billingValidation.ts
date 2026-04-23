@@ -5,7 +5,6 @@ export function computeLancamentosOkValues(record: BillingRecord) {
   const saldoCaixa = record.fechamento - record.abertura;
   const totalCreditoSistemaPos = record.credito + record.creditoPos;
   const totalPix = record.qrCode + record.pixPos + record.transferencia;
-  const totalDebitoTefPos = record.debitoBruto + record.debitoPos;
 
   return {
     caixaOk:
@@ -14,7 +13,7 @@ export function computeLancamentosOkValues(record: BillingRecord) {
       (record.dinheiro - (record.debitoPos + record.creditoPos)),
     pixOk: totalPix - record.pix,
     creditoOk: record.creditoBruto - totalCreditoSistemaPos,
-    debitoOk: totalDebitoTefPos - record.debito,
+    debitoOk: record.debitoBruto - (record.debito + record.debitoPos),
   };
 }
 

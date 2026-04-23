@@ -17,30 +17,66 @@ export type Database = {
       app_users: {
         Row: {
           ativo: boolean | null
+          approval_status: string
+          approved_at: string | null
+          approved_by: string | null
           cargo: string | null
           created_at: string | null
           email: string
           id: string
           nome: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
           updated_at: string | null
         }
         Insert: {
           ativo?: boolean | null
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           cargo?: string | null
           created_at?: string | null
           email: string
           id?: string
           nome?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
           updated_at?: string | null
         }
         Update: {
           ativo?: boolean | null
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           cargo?: string | null
           created_at?: string | null
           email?: string
           id?: string
           nome?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      permissions: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -198,6 +234,7 @@ export type Database = {
           recebido_total_liquido: number | null
           taxa_tarifa: number | null
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -212,6 +249,7 @@ export type Database = {
           recebido_total_liquido?: number | null
           taxa_tarifa?: number | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -226,6 +264,58 @@ export type Database = {
           recebido_total_liquido?: number | null
           taxa_tarifa?: number | null
           updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          created_at: string
+          permission_id: string
+          role_id: string
+        }
+        Insert: {
+          created_at?: string
+          permission_id: string
+          role_id: string
+        }
+        Update: {
+          created_at?: string
+          permission_id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }

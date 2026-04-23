@@ -28,7 +28,11 @@ import {
 } from '@/lib/billing';
 import { computeLancamentosOkValues } from '@/lib/billingValidation';
 
-const BillingForm = () => {
+type BillingFormProps = {
+  canEdit?: boolean;
+};
+
+const BillingForm = ({ canEdit = true }: BillingFormProps) => {
   const [allData, setAllData] = useState<Record<string, BillingRecord>>({});
   const [record, setRecord] = useState<BillingRecord>(emptyRecord());
   const [isEditing, setIsEditing] = useState(false);
@@ -116,6 +120,10 @@ const BillingForm = () => {
   const { caixaOk, pixOk, creditoOk, debitoOk } = computeLancamentosOkValues(record);
 
   const handleSave = useCallback(async () => {
+    if (!canEdit) {
+      toast.error('Você não possui permissão para editar faturamento.');
+      return;
+    }
     if (!record.data) {
       toast.error('Por favor, selecione uma data.');
       return;
@@ -145,7 +153,7 @@ const BillingForm = () => {
     } else {
       toast.error(result.error || 'Erro ao salvar dados.');
     }
-  }, [record, isEditing]);
+  }, [canEdit, record, isEditing]);
 
   const handleCancel = useCallback(() => {
     setRecord(emptyRecord());
@@ -193,7 +201,7 @@ const BillingForm = () => {
       </div>
 
       <fieldset
-        disabled={!record.data}
+        disabled={!record.data || !canEdit}
         className="border-0 p-0 m-0 w-full min-w-0 space-y-5 disabled:opacity-60 disabled:pointer-events-none"
       >
       {/* Sections grid */}
@@ -398,7 +406,7 @@ const BillingForm = () => {
         <button
           type="button"
           onClick={handleSave}
-          disabled={saving || !record.data}
+          disabled={saving || !record.data || !canEdit}
           className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-primary-foreground transition-all disabled:opacity-50 hover:opacity-90"
           style={{ background: 'var(--gradient-primary)' }}
         >
@@ -406,6 +414,11 @@ const BillingForm = () => {
           {saving ? 'Salvando...' : 'Salvar'}
         </button>
       </div>
+      {!canEdit && (
+        <p className="text-xs text-muted-foreground pb-6">
+          Seu perfil possui acesso de visualização para faturamento.
+        </p>
+      )}
     </div>
   );
 };

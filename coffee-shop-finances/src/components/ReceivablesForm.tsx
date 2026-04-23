@@ -12,7 +12,11 @@ import {
   saveReceivablesRecord,
 } from '@/lib/receivables';
 
-const ReceivablesForm = () => {
+type ReceivablesFormProps = {
+  canEdit?: boolean;
+};
+
+const ReceivablesForm = ({ canEdit = true }: ReceivablesFormProps) => {
   const [allData, setAllData] = useState<Record<string, ReceivablesRecord>>({});
   const [record, setRecord] = useState<ReceivablesRecord>(emptyReceivablesRecord());
   const [isEditing, setIsEditing] = useState(false);
@@ -119,6 +123,10 @@ const ReceivablesForm = () => {
   }, [allData, resetForm, setCurrencyFromRecord, updateField]);
 
   const handleSave = useCallback(async () => {
+    if (!canEdit) {
+      toast.error('Você não possui permissão para editar faturamento.');
+      return;
+    }
     if (!record.data) {
       toast.error('Por favor, selecione uma data.');
       return;
@@ -146,7 +154,7 @@ const ReceivablesForm = () => {
     } else {
       toast.error(result.error || 'Erro ao salvar recebíveis.');
     }
-  }, [isEditing, record, resetForm]);
+  }, [canEdit, isEditing, record, resetForm]);
 
   const handleCancel = useCallback(() => {
     resetForm();
@@ -193,7 +201,7 @@ const ReceivablesForm = () => {
       </div>
 
       <fieldset
-        disabled={!record.data}
+        disabled={!record.data || !canEdit}
         className="border-0 p-0 m-0 w-full min-w-0 space-y-5 disabled:opacity-60 disabled:pointer-events-none"
       >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -257,7 +265,7 @@ const ReceivablesForm = () => {
         <button
           type="button"
           onClick={handleSave}
-          disabled={saving || !record.data}
+          disabled={saving || !record.data || !canEdit}
           className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-primary-foreground transition-all disabled:opacity-50 hover:opacity-90"
           style={{ background: 'var(--gradient-primary)' }}
         >
@@ -265,6 +273,11 @@ const ReceivablesForm = () => {
           {saving ? 'Salvando...' : 'Salvar'}
         </button>
       </div>
+      {!canEdit && (
+        <p className="text-xs text-muted-foreground pb-6">
+          Seu perfil possui acesso de visualização para faturamento.
+        </p>
+      )}
     </div>
   );
 };

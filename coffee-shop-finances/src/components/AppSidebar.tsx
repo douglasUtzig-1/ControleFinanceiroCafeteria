@@ -6,6 +6,7 @@ import {
   BarChart3,
   Settings,
   User,
+  LogOut,
   ChevronLeft,
   ChevronRight,
   Coffee,
@@ -14,6 +15,9 @@ import {
 interface SidebarProps {
   activePage: string;
   onPageChange: (page: string) => void;
+  visiblePages?: string[];
+  userLabel?: string;
+  onLogout?: () => void;
 }
 
 const navItems = [
@@ -23,7 +27,7 @@ const navItems = [
   { id: 'settings', icon: Settings, label: 'Configurações' },
 ];
 
-const AppSidebar = ({ activePage, onPageChange }: SidebarProps) => {
+const AppSidebar = ({ activePage, onPageChange, visiblePages, userLabel, onLogout }: SidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const navRef = useRef<HTMLUListElement>(null);
   const [autoWidth, setAutoWidth] = useState<number | null>(null);
@@ -41,6 +45,8 @@ const AppSidebar = ({ activePage, onPageChange }: SidebarProps) => {
       setAutoWidth(Math.max(totalWidth, 140)); // min 140px
     }
   }, [collapsed]);
+
+  const allowedItems = navItems.filter((item) => !visiblePages || visiblePages.includes(item.id));
 
   return (
     <aside
@@ -62,7 +68,7 @@ const AppSidebar = ({ activePage, onPageChange }: SidebarProps) => {
       {/* Nav */}
       <nav className="flex-1 py-4">
         <ul ref={navRef} className="space-y-1 px-2">
-          {navItems.map(item => {
+          {allowedItems.map(item => {
             const Icon = item.icon;
             const isActive = activePage === item.id;
             return (
@@ -88,11 +94,24 @@ const AppSidebar = ({ activePage, onPageChange }: SidebarProps) => {
 
       {/* Footer */}
       <div className="px-3 py-3 border-t border-sidebar-border">
-        <div className="flex items-center gap-3 px-2">
-          <div className="w-7 h-7 rounded-full bg-sidebar-accent flex items-center justify-center">
-            <User className="w-3.5 h-3.5 text-sidebar-foreground" />
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-7 h-7 rounded-full bg-sidebar-accent flex items-center justify-center">
+              <User className="w-3.5 h-3.5 text-sidebar-foreground" />
+            </div>
+            {!collapsed && <span className="text-xs text-sidebar-foreground">{userLabel || "Usuário"}</span>}
           </div>
-          {!collapsed && <span className="text-xs text-sidebar-foreground">Usuário</span>}
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
+              title="Sair"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              {!collapsed && <span>Sair</span>}
+            </button>
+          )}
         </div>
       </div>
 
